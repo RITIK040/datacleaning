@@ -1,0 +1,46 @@
+
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: quant-data-pro
+    ports:
+      - "8501:8501"
+    environment:
+      - STREAMLIT_SERVER_HEADLESS=true
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+    volumes:
+      - ./app.py:/app/app.py
+      - ./cleaner_app.py:/app/cleaner_app.py
+      - ./cleaner_engine.py:/app/cleaner_engine.py
+      - ./data_engine.py:/app/data_engine.py
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8501/', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Uncomment below for live reload development
+  # app-dev:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: quant-data-pro-dev
+  #   ports:
+  #     - "8502:8501"
+  #   volumes:
+  #     - ./app.py:/app/app.py
+  #     - ./cleaner_app.py:/app/cleaner_app.py
+  #     - ./cleaner_engine.py:/app/cleaner_engine.py
+  #     - ./data_engine.py:/app/data_engine.py
+  #   environment:
+  #     - STREAMLIT_SERVER_HEADLESS=true
+  #     - STREAMLIT_SERVER_PORT=8501
+  #     - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+  #     - STREAMLIT_SERVER_RUNONSAVE=true
+  #   restart: unless-stopped
